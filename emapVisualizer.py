@@ -25,11 +25,13 @@ parser.add_argument("-g", "--graph", metavar="N", type=int, default=3, help="Onl
 
 parser.add_argument("-t", "--top", metavar="NN", type=int, default=20, help="Top NN of the annotations will be displayed per domain (Default is 20)")
 
-parser.add_argument("-o", "--outdir", metavar="dir", default="emapvis", help="Output directory for the graphs")
+#parser.add_argument("-o", "--outdir", metavar="dir", default="emapvis", help="Output directory for the graphs")
 
 parser.add_argument("-c", "--cmap", metavar="code", default="RdYlGn", help="Color map code for matplotlib for the prettyness of the graphs\nI suggest the following:\nRdYlBu\nSpectral\nviridis\nplasma\nRdYlGn (Default)")
 
 parser.add_argument("-l", "--level", metavar="N", default=5, type=int, help="Gene onthology level")
+
+parser.add_argument("-b", "--barall", metavar="N", default=0, type=int, help="Creates the bar  ")
 
 args = vars(parser.parse_args())
 
@@ -40,8 +42,9 @@ graph = args["graph"]
 top = args["top"]
 annotChoice = args["annot"]
 colsch = args["cmap"]
-outdir = args["outdir"]
+#outdir = args["outdir"]
 level = args["level"]
+barall = args["barall"]
 
 #Checking for arguments
 """
@@ -72,7 +75,7 @@ def createBar(domain,annotData,numElem,cols):
 	counts = []
 	annots = []
 
-	annotData = annotData[:top]
+	annotData = annotData[:numElem]
 	print("=======")
 	print(annotData)
 
@@ -118,7 +121,7 @@ def createPie(domain,annotData,numElem,cols):
 	counts = []
 	annots = []
 
-	annotData = annotData[:top]
+	annotData = annotData[:numElem]
 
 	for elem in annotData:
 		count = elem[0]
@@ -134,6 +137,50 @@ def createPie(domain,annotData,numElem,cols):
 	plt.pie(counts, labels=annots, autopct='%1.1f%%', colors=colors, pctdistance=1.1, labeldistance=1.2)
 	plt.axis("equal")
 	plt.title(graphTitle, loc="left")
+	plt.savefig(outfilename, dpi=100)
+
+def createBarall(bps,ccs,mfs,numElem,cols):
+	#ADD INFO FOR GRAPH ELEMENTS
+	outfilename = "BarAll.png"		
+	title = "Top 20 Annotations for Each Domain"
+	cmap = plt.get_cmap(cols)
+	color1 = cmap(.1)
+	color2 = cmap(.4)
+	color3 = cmap(.9)
+	colorGet = [color1, color2, color3]
+	colors =[]
+
+	for color in colorGet:
+		i = 0
+		while i < 20:
+			colors.append(color)	
+			i += 1
+	
+	#POPULATE DATA
+	counts = []
+	annots = []
+
+	bps = bps[:numElem]
+	ccs = ccs[:numElem]
+	mfs = mfs[:numElem]	
+
+	annotData = bps + ccs + mfs
+
+	for elem in annotData:
+		count = elem[0]
+		annot = elem[1]
+		counts.append(count)
+		annots.append(annot)	
+	
+	y_pos = np.arange(len(annots))
+
+	#GENERATE GRAPH AND GRAPH ELEMENTS
+ 	fig = plt.figure(figsize=(20, 10))
+	plt.bar(y_pos, counts, align="center", alpha=0.5, color=colors)
+	plt.xticks(y_pos, annots, rotation=45, ha="right", va="top")
+	plt.subplots_adjust(left=None, bottom=.35, right=None, top=None, wspace=None, hspace=None    )
+	plt.ylabel("Gene Count")
+	plt.title(title)
 	plt.savefig(outfilename, dpi=100)
 
 #GET ALL SIGNIFICANT DATA
@@ -213,7 +260,11 @@ elif graph == 3:
 		createBar(3,mfs,top,colsch)
 		createPie(3,mfs,top,colsch)
 
-
+#Check if to create barall
+if barall == 1:
+	createBarall(bps,ccs,mfs,top,colsch)
+else:
+	pass
 
 
 
