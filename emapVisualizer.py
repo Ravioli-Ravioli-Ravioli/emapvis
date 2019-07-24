@@ -3,6 +3,7 @@
 import argparse
 from argparse import RawTextHelpFormatter
 import matplotlib.pyplot as plt; plt.rcdefaults()
+import matplotlib.patches as mpatches
 import numpy as np
 
 """
@@ -96,7 +97,7 @@ def createBar(domain,annotData,numElem,cols):
 	#GENERATE GRAPH AND GRAPH ELEMENTS
 
 	fig = plt.figure(figsize=(20, 10))
-	plt.bar(y_pos, counts, align="center", alpha=0.5, color=colors)
+	plt.bar(y_pos, counts, align="center", alpha=0.5, color=colors, edgecolor="black")
 	plt.xticks(y_pos, annots, rotation=45, ha="right", va="top")
 	plt.subplots_adjust(left=None, bottom=.35, right=None, top=None, wspace=None, hspace=None)
 	plt.ylabel("Gene Count")
@@ -149,6 +150,9 @@ def createBarall(bps,ccs,mfs,numElem,cols):
 	color3 = cmap(.9)
 	colorGet = [color1, color2, color3]
 	colors =[]
+	bp = mpatches.Patch(color=color1, label='biological_process')
+	cc = mpatches.Patch(color=color2, label='cellular_component')
+	mf = mpatches.Patch(color=color3, label='molecular_function')
 
 	for color in colorGet:
 		i = 0
@@ -176,11 +180,12 @@ def createBarall(bps,ccs,mfs,numElem,cols):
 
 	#GENERATE GRAPH AND GRAPH ELEMENTS
  	fig = plt.figure(figsize=(20, 10))
-	plt.bar(y_pos, counts, align="center", alpha=0.5, color=colors)
+	plt.bar(y_pos, counts, align="center", alpha=0.5, color=colors, edgecolor="black")
 	plt.xticks(y_pos, annots, rotation=45, ha="right", va="top")
 	plt.subplots_adjust(left=None, bottom=.35, right=None, top=None, wspace=None, hspace=None    )
 	plt.ylabel("Gene Count")
 	plt.title(title)
+	plt.legend(handles=[bp, cc, mf])
 	plt.savefig(outfilename, dpi=100)
 
 #GET ALL SIGNIFICANT DATA
